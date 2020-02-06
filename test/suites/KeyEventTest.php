@@ -16,8 +16,8 @@ class KeyEventTest extends BaseTestCase
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();
-        $factory = new BrowserFactory('chromium-browser');
-        self::$browser = $factory->createBrowser(['headless' => false]);
+        $factory = new BrowserFactory();
+        self::$browser = $factory->createBrowser();
     }
 
     public static function tearDownAfterClass()
