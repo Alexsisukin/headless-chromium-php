@@ -13,6 +13,7 @@ use HeadlessChromium\Cookies\CookiesCollection;
 use HeadlessChromium\Exception\CommunicationException;
 use HeadlessChromium\Exception\NoResponseAvailable;
 use HeadlessChromium\Exception\TargetDestroyed;
+use HeadlessChromium\Input\Keyboard;
 use HeadlessChromium\Input\Mouse;
 use HeadlessChromium\PageUtils\CookiesGetter;
 use HeadlessChromium\PageUtils\PageEvaluation;
@@ -43,6 +44,11 @@ class Page
      * @var Mouse|Null
      */
     protected $mouse;
+
+    /**
+     * @var Keyboard|null
+     */
+    protected $keyboard;
 
     /**
      * Page constructor.
@@ -251,12 +257,12 @@ class Page
                 const script = document.createElement("script");
                 script.type = "text/javascript";
                 script.src = src;
-                
+
                 const promise = new Promise((res, rej) => {
                     script.onload = res;
                     script.onerror = rej;
                 });
-                
+
                 document.head.appendChild(script);
                 await promise;
             }';
@@ -266,12 +272,12 @@ class Page
                 var script = document.createElement("script");
                 script.type = "text/javascript";
                 script.text = scriptContent;
-                
+
                 let error = null;
                 script.onerror = e => {error = e};
-                
+
                 document.head.appendChild(script);
-                
+
                 if (error) {
                     throw error;
                 }
@@ -540,7 +546,7 @@ class Page
             }
             $pdfOptions['printBackground'] = $options['printBackground'];
         }
-    
+
         // option displayHeaderFooter
         if (array_key_exists('displayHeaderFooter', $options)) {
             // displayHeaderFooter requires type to be boolean
@@ -551,7 +557,7 @@ class Page
             }
             $pdfOptions['displayHeaderFooter'] = $options['displayHeaderFooter'];
         }
-    
+
         // option headerTemplate
         if (array_key_exists('headerTemplate', $options)) {
             // headerTemplate requires type to be string
@@ -562,7 +568,7 @@ class Page
             }
             $pdfOptions['headerTemplate'] = $options['headerTemplate'];
         }
-    
+
         // option footerTemplate
         if (array_key_exists('footerTemplate', $options)) {
             // footerTemplate requires type to be string
@@ -732,6 +738,19 @@ class Page
         }
 
         return $this->mouse;
+    }
+    /**
+     * Get key object to play with
+     *
+     * @return Keyboard
+     */
+    public function keyboard()
+    {
+        if (!$this->keyboard) {
+            $this->keyboard = new Keyboard($this);
+        }
+
+        return $this->keyboard;
     }
 
     /**
