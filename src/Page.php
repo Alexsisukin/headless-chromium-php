@@ -27,8 +27,8 @@ class Page
 {
 
     const DOM_CONTENT_LOADED = 'DOMContentLoaded';
-    const LOAD = 'load';
-    const NETWORK_IDLE = 'networkIdle';
+    const LOAD               = 'load';
+    const NETWORK_IDLE       = 'networkIdle';
 
     /**
      * @var Target
@@ -52,8 +52,9 @@ class Page
 
     /**
      * Page constructor.
+     *
      * @param Target $target
-     * @param array $frameTree
+     * @param array  $frameTree
      */
     public function __construct(Target $target, array $frameTree)
     {
@@ -65,8 +66,9 @@ class Page
      * Adds a script to be evaluated upon page navigation
      *
      * @param string $script
-     * @param array $options
+     * @param array  $options
      *  - onLoad: defer script execution after page has loaded (useful for scripts that require the dom to be populated)
+     *
      * @throws CommunicationException
      * @throws NoResponseAvailable
      */
@@ -119,6 +121,7 @@ class Page
 
     /**
      * Get the session this page is attached to
+     *
      * @return Session
      */
     public function getSession(): Session
@@ -130,6 +133,7 @@ class Page
 
     /**
      * Sets the HTTP header necessary for basic authentication.
+     *
      * @param string $username
      * @param string $password
      */
@@ -144,7 +148,7 @@ class Page
 
     /**
      * @param string $url
-     * @param array $options
+     * @param array  $options
      *  - strict: make waitForNAvigation to fail if a new navigation is initiated. Default: false
      *
      * @return PageNavigation
@@ -168,6 +172,7 @@ class Page
      * ```
      *
      * @param string $expression
+     *
      * @return PageEvaluation
      * @throws Exception\CommunicationException
      */
@@ -180,13 +185,14 @@ class Page
             new Message(
                 'Runtime.evaluate',
                 [
-                    'awaitPromise' => true,
+                    'awaitPromise'  => true,
                     'returnByValue' => true,
-                    'expression' => $expression,
-                    'userGesture' => true
+                    'expression'    => $expression,
+                    'userGesture'   => true,
                 ]
             )
         );
+
         return new PageEvaluation($reader, $currentLoaderId, $this);
     }
 
@@ -203,7 +209,8 @@ class Page
      * ```
      *
      * @param string $functionDeclaration
-     * @param array $arguments
+     * @param array  $arguments
+     *
      * @return PageEvaluation
      * @throws CommunicationException
      */
@@ -218,15 +225,15 @@ class Page
                 'Runtime.callFunctionOn',
                 [
                     'functionDeclaration' => $functionDeclaration,
-                    'arguments' => array_map(function ($arg) {
+                    'arguments'           => array_map(function ($arg) {
                         return [
-                            'value' => $arg
+                            'value' => $arg,
                         ];
                     }, $arguments),
-                    'executionContextId' => $executionContextId,
-                    'awaitPromise' => true,
-                    'returnByValue' => true,
-                    'userGesture' => true
+                    'executionContextId'  => $executionContextId,
+                    'awaitPromise'        => true,
+                    'returnByValue'       => true,
+                    'userGesture'         => true,
                 ]
             )
         );
@@ -245,6 +252,7 @@ class Page
      * ```
      *
      * @param array $options
+     *
      * @return PageEvaluation
      * @throws CommunicationException
      */
@@ -304,6 +312,7 @@ class Page
         $this->assertNotClosed();
 
         $this->getSession()->getConnection()->readData();
+
         return $this->frameManager->getMainFrame()->getLifeCycle();
     }
 
@@ -317,6 +326,7 @@ class Page
      * ```
      *
      * @param string $event
+     *
      * @return bool
      * @throws CommunicationException\CannotReadResponse
      * @throws CommunicationException\InvalidResponse
@@ -332,8 +342,9 @@ class Page
      * Wait for the page to unload
      *
      * @param string $eventName
-     * @param int $timeout
-     * @param null $loaderId
+     * @param int    $timeout
+     * @param null   $loaderId
+     *
      * @return $this
      * @throws CommunicationException\CannotReadResponse
      * @throws CommunicationException\InvalidResponse
@@ -348,11 +359,13 @@ class Page
         }
 
         Utils::tryWithTimeout($timeout * 1000, $this->waitForReloadGenerator($eventName, $loaderId));
+
         return $this;
     }
 
     /**
      * @param $loaderId
+     *
      * @return bool|\Generator
      * @throws CommunicationException\CannotReadResponse
      * @throws CommunicationException\InvalidResponse
@@ -396,11 +409,13 @@ class Page
      * ```
      *
      * @param int|null $timeout
+     *
      * @return Clip
      */
     public function getFullPageClip(int $timeout = null): Clip
     {
         $contentSize = $this->getLayoutMetrics()->await($timeout)->getContentSize();
+
         return new Clip(0, 0, $contentSize['width'], $contentSize['height']);
     }
 
@@ -479,11 +494,11 @@ class Page
 
             // add to params
             $screenshotOptions['clip'] = [
-                'x' => $options['clip']->getX(),
-                'y' => $options['clip']->getY(),
-                'width' => $options['clip']->getWidth(),
+                'x'      => $options['clip']->getX(),
+                'y'      => $options['clip']->getY(),
+                'width'  => $options['clip']->getWidth(),
                 'height' => $options['clip']->getHeight(),
-                'scale' => $options['clip']->getScale()
+                'scale'  => $options['clip']->getScale(),
             ];
         }
 
@@ -516,6 +531,7 @@ class Page
      *  - marginRight: default 1 cm
      *  - preferCSSPageSize: default false
      *  - scale: default 1
+     *
      * @return PagePdf
      * @throws CommunicationException
      */
@@ -681,12 +697,14 @@ class Page
      * ```
      * $page->setDeviceMetricsOverride
      * ```
+     *
      * @param $overrides
-     * @throws CommunicationException
-     * @throws NoResponseAvailable
      *
      * @return ResponseWaiter
      *
+     * @throws NoResponseAvailable
+     *
+     * @throws CommunicationException
      */
     public function setDeviceMetricsOverride(array $overrides)
     {
@@ -704,6 +722,7 @@ class Page
         }
 
         $this->assertNotClosed();
+
         return new ResponseWaiter($this->getSession()->sendMessage(
             new Message('Emulation.setDeviceMetricsOverride', $overrides)
         ));
@@ -714,21 +733,23 @@ class Page
      *
      * @param int $width
      * @param int $height
-     * @throws CommunicationException
-     * @throws NoResponseAvailable
      *
      * @return ResponseWaiter
+     * @throws NoResponseAvailable
+     *
+     * @throws CommunicationException
      */
     public function setViewport(int $width, int $height)
     {
         return $this->setDeviceMetricsOverride([
-            'width' => $width,
-            'height' => $height
+            'width'  => $width,
+            'height' => $height,
         ]);
     }
 
     /**
      * Get mouse object to play with
+     *
      * @return Mouse
      */
     public function mouse()
@@ -739,6 +760,7 @@ class Page
 
         return $this->mouse;
     }
+
     /**
      * Get key object to play with
      *
@@ -755,6 +777,7 @@ class Page
 
     /**
      * Request to close the page
+     *
      * @throws CommunicationException
      */
     public function close()
@@ -811,14 +834,14 @@ class Page
      *   $page->readCookies()->await()->getCookies();
      * ```
      *
-     * @see getCookies
-     * @see readAllCookies
-     * @see getAllCookies
-     *
      * @return CookiesGetter
      * @throws CommunicationException
      * @throws CommunicationException\CannotReadResponse
      * @throws CommunicationException\InvalidResponse
+     * @see readAllCookies
+     * @see getAllCookies
+     *
+     * @see getCookies
      */
     public function readCookies()
     {
@@ -830,7 +853,7 @@ class Page
             new Message(
                 'Network.getCookies',
                 [
-                    'urls' => [$this->getCurrentUrl()]
+                    'urls' => [$this->getCurrentUrl()],
                 ]
             )
         );
@@ -842,15 +865,15 @@ class Page
     /**
      * Read all cookies in the browser
      *
-     * @see getCookies
-     * @see readCookies
+     * @return CookiesGetter
+     * @throws CommunicationException
      * @see getAllCookies
      *
      * ```
      *   $page->readCookies()->await()->getCookies();
      * ```
-     * @return CookiesGetter
-     * @throws CommunicationException
+     * @see getCookies
+     * @see readCookies
      */
     public function readAllCookies()
     {
@@ -867,15 +890,16 @@ class Page
     /**
      * Get cookies for the current page synchronously
      *
-     * @see readCookies
-     * @see readAllCookies
-     * @see getAllCookies
-     *
      * @param int|null $timeout
+     *
      * @return CookiesCollection
      * @throws CommunicationException
      * @throws Exception\OperationTimedOut
      * @throws NoResponseAvailable
+     * @see getAllCookies
+     *
+     * @see readCookies
+     * @see readAllCookies
      */
     public function getCookies(int $timeout = null)
     {
@@ -885,15 +909,16 @@ class Page
     /**
      * Get all browser cookies synchronously
      *
-     * @see getCookies
-     * @see readAllCookies
-     * @see readCookies
-     *
      * @param int|null $timeout
+     *
      * @return CookiesCollection
      * @throws CommunicationException
      * @throws Exception\OperationTimedOut
      * @throws NoResponseAvailable
+     * @see readCookies
+     *
+     * @see getCookies
+     * @see readAllCookies
      */
     public function getAllCookies(int $timeout = null)
     {
@@ -914,7 +939,7 @@ class Page
         // feed list of cookies to send
         foreach ($cookies as $cookie) {
             $browserCookie = [
-                'name' => $cookie->getName(),
+                'name'  => $cookie->getName(),
                 'value' => $cookie->getValue(),
             ];
 
@@ -944,15 +969,26 @@ class Page
 
     /**
      * Set user agent for the current page
+     *
      * @param string $userAgent
+     * @param null   $acceptLanguage
+     * @param null   $platform
+     *
      * @return ResponseWaiter
      * @throws CommunicationException
      */
-    public function setUserAgent(string $userAgent)
+    public function setUserAgent(string $userAgent, $acceptLanguage = null, $platform = null)
     {
+        $data = ['userAgent' => $userAgent];
+        if (!is_null($acceptLanguage)) {
+            $data['acceptLanguage'] = $acceptLanguage;
+        }
+        if (!is_null($platform)) {
+            $data['platform'] = $platform;
+        }
         $response = $this->getSession()
             ->sendMessage(
-                new Message('Network.setUserAgentOverride', ['userAgent' => $userAgent])
+                new Message('Network.setUserAgentOverride', $data)
             );
 
         return new ResponseWaiter($response);
