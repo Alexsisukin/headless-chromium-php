@@ -94,4 +94,14 @@ class Cookie implements \ArrayAccess
         $params['value'] = $value;
         return new Cookie($params);
     }
+
+    /**
+     * Getter param data
+     *
+     * @return array
+     */
+    public function getData(): ?array
+    {
+        return $this->data;
+    }
 }
