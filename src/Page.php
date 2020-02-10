@@ -971,13 +971,13 @@ class Page
      * Set user agent for the current page
      *
      * @param string $userAgent
-     * @param null   $acceptLanguage
-     * @param null   $platform
+     * @param string $acceptLanguage
+     * @param string $platform
      *
      * @return ResponseWaiter
      * @throws CommunicationException
      */
-    public function setUserAgent(string $userAgent, $acceptLanguage = null, $platform = null)
+    public function setUserAgent(string $userAgent, string $acceptLanguage = null, string $platform = null)
     {
         $data = ['userAgent' => $userAgent];
         if (!is_null($acceptLanguage)) {
